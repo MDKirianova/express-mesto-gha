@@ -1,35 +1,26 @@
-const userModel = require("../models/user");
+const userModel = require('../models/user');
 
 function getUsersInfo(req, res) {
   return userModel
     .find({})
-    .then((users) => {
-      return res.status(200).send(users);
-    })
-    .catch(() => {
-      return res
-        .status(500)
-        .send({ message: "Ошибка по умолчанию. Server error" });
-    });
+    .then((users) => res.status(200).send(users))
+    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию. Server error' }));
 }
 
 function createUser(req, res) {
   const { name, about, avatar } = req.body;
   return userModel
     .create({ name, about, avatar })
-    .then((user) => {
-      return res.status(201).send(user);
-    })
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === "ValidationError" || err.name === "CastError") {
+      if (err.name === 'ValidationError') {
         return res
           .status(400)
-          .send({ message: "Переданы некорректные данные" });
-      } else {
-        return res
-          .status(500)
-          .send({ message: "Ошибка по умолчанию. Server error" });
+          .send({ message: 'Переданы некорректные данные' });
       }
+      return res
+        .status(500)
+        .send({ message: 'Ошибка по умолчанию. Server error' });
     });
 }
 
@@ -41,19 +32,19 @@ function getUserInfo(req, res) {
       if (!user) {
         return res
           .status(404)
-          .send({ message: "Пользователь по указанному _id не найден" });
+          .send({ message: 'Пользователь по указанному _id не найден' });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return res
           .status(400)
-          .send({ message: "Переданы некорректный _id пользователя " });
+          .send({ message: 'Переданы некорректный _id пользователя ' });
       }
       return res
         .status(500)
-        .send({ message: "Ошибка по умолчанию. Server error" });
+        .send({ message: 'Ошибка по умолчанию. Server error' });
     });
 }
 
@@ -64,25 +55,25 @@ function updateUserProfile(req, res) {
     .findByIdAndUpdate(
       userId,
       { name, about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
     .then((user) => {
       if (!user) {
         return res
           .status(404)
-          .send({ message: "Пользователь по указанному _id не найден" });
+          .send({ message: 'Пользователь по указанному _id не найден' });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError" || err.name === "CastError") {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(400).send({
-          message: "Переданы некорректные данные при обновлении профиля",
+          message: 'Переданы некорректные данные при обновлении профиля',
         });
       }
       return res
         .status(500)
-        .send({ message: "Ошибка по умолчанию. Server error" });
+        .send({ message: 'Ошибка по умолчанию. Server error' });
     });
 }
 
@@ -95,19 +86,19 @@ function updateUserAvatar(req, res) {
       if (!user) {
         return res
           .status(404)
-          .send({ message: "Пользователь по указанному _id не найден" });
+          .send({ message: 'Пользователь по указанному _id не найден' });
       }
       return res.status(200).send(user);
     })
-    .catch((err)=>{
-      if (err.name === "ValidationError" || err.name === "CastError") {
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(400).send({
-          message: "Переданы некорректные данные при обновлении аватара",
+          message: 'Переданы некорректные данные при обновлении аватара',
         });
       }
       return res
         .status(500)
-        .send({ message: "Ошибка по умолчанию. Server error" });
+        .send({ message: 'Ошибка по умолчанию. Server error' });
     });
 }
 

@@ -1,10 +1,11 @@
 const express = require('express');
-const { default: mongoose } = require('mongoose');
-const { PORT = 3000 } = process.env;
+const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards')
+const cardRouter = require('./routes/cards');
 
-mongoose.connect('mongodb://localhost:27017/mestodb')
+const { PORT = 3000 } = process.env;
+
+mongoose.connect('mongodb://localhost:27017/mestodb');
 const app = express();
 
 app.use(express.json());
@@ -12,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '656ce5314a1ae05871abc9f4' // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: '656ce5314a1ae05871abc9f4', // вставьте сюда _id созданного в предыдущем пункте пользователя
   };
 
   next();
