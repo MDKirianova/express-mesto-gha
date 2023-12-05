@@ -21,11 +21,13 @@ function createUser(req, res) {
       return res.status(201).send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidatorError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные",
-        });
+      if (err.name === "ValidationError" || err.name === "CastError") {
+        console.log(err.name, err.message);
+        return res
+          .status(400)
+          .send({ message: "Переданы некорректные данные" });
       } else {
+        console.log(err.name, err.message);
         return res
           .status(500)
           .send({ message: "Ошибка по умолчанию. Server error" });
