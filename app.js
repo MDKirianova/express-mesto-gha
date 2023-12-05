@@ -4,9 +4,7 @@ const { PORT = 3000 } = process.env;
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards')
 
-mongoose.connect('mongodb://localhost:27017/mestodb').then(() => {
-  console.log('mongoDB connected');
-});
+mongoose.connect('mongodb://localhost:27017/mestodb')
 const app = express();
 
 app.use(express.json());
@@ -27,6 +25,4 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Страницы по такому URL не найдено' });
 });
 
-app.listen(PORT, () => {
-  console.log("Server started on port 3000");
-});
+app.listen(PORT);
