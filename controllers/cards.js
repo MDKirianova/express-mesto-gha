@@ -22,7 +22,7 @@ function createCard(req, res) {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         console.log(err.name, err.message);
         return res
           .status(400)
@@ -48,7 +48,7 @@ function deleteCard(req, res) {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === "CastError" || err.name === "ValidationError" ) {
         return res.status(400).send({
           message: "Передан некорректный _id карточки",
         });
