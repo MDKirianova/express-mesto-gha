@@ -43,9 +43,10 @@ function createUser(req, res, next) {
       } else
         if (err.name === 'ValidationError') {
           next(new BadRequestError('Переданы некорректные данные при регистрации пользователя'));
-        } else {
-          next(err);
         }
+        // else {
+        //   next(err);
+        // }
     });
 }
 

@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
@@ -15,6 +17,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
 
 app.post('/signup', validateCreateUser, createUser);
 app.post('/signin', validateLoginUser, login);
@@ -24,6 +27,7 @@ app.use(userRouter);
 app.use(cardRouter);
 
 app.use((req, res, next) => next(new NotFoundError('Страницы по такому URL не найдено')));
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT);
