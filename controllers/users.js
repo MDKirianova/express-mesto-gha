@@ -74,9 +74,8 @@ function getUsersInfo(req, res, next) {
 }
 
 function getUserInfo(req, res, next) {
-  const { userId } = req.params;
   return userModel
-    .findById(userId)
+    .findById(req.params)
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь по указанному _id не найден'));
