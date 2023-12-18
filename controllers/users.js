@@ -75,16 +75,16 @@ function getUsersInfo(req, res, next) {
 
 function getUserInfo(req, res, next) {
   return userModel
-    .findById(req.params)
+    .findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь по указанному _id не найден'));
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный _id пользователя'));
+        return next(new BadRequestError('Передан некорректный _id пользователя'));
       }
       return next(err);
     });
@@ -95,13 +95,13 @@ function getCurrentUserInfo(req, res, next) {
     .findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь по указанному _id не найден'));
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный _id пользователя'));
+        return next(new BadRequestError('Передан некорректный _id пользователя'));
       }
       return next(err);
     });
