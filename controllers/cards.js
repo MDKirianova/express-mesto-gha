@@ -1,13 +1,16 @@
 const cardModel = require('../models/card');
+const BadRequestError = require('../errors/BadRequest');
+const NotFoundError = require('../errors/NotFound');
+const ForbiddenError = require('../errors/Forbidden');
 
-function getAllCards(req, res) {
+function getAllCards(req, res, next) {
   return cardModel
     .find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию. Server error' }));
+    .catch((err) => next(err));
 }
 
-function createCard(req, res) {
+function createCard(req, res, next) {
   const userId = req.user._id;
   const { name, link } = req.body;
   cardModel
@@ -17,40 +20,33 @@ function createCard(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res
-          .status(400)
-          .send({ message: 'Переданы некорректные данные' });
+        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       }
-      return res
-        .status(500)
-        .send({ message: 'Ошибка по умолчанию. Server error' });
+      return next(err);
     });
 }
 
-function deleteCard(req, res) {
+function deleteCard(req, res, next) {
   cardModel
-    .findByIdAndDelete(req.params.cardId)
+    .findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Карточка по указанному _id не найдена' });
+        next(new NotFoundError('Карточка по указанному _id не найдена'));
       }
-      return res.status(200).send(card);
+      if (card.owner.toString() !== req.user._id) {
+        next(new ForbiddenError('Нет прав на удаление'));
+      }
+      cardModel.findByIdAndDelete(req.params.cardId).then(() => res.send({ message: 'Карточка удалена' })).catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Передан некорректный _id карточки',
-        });
+        next(new BadRequestError('Передан некорректный _id карточки'));
       }
-      return res
-        .status(500)
-        .send({ message: 'Ошибка по умолчанию. Server error' });
+      return next(err);
     });
 }
 
-function likeCard(req, res) {
+function likeCard(req, res, next) {
   cardModel
     .findByIdAndUpdate(
       req.params.cardId,
@@ -59,26 +55,19 @@ function likeCard(req, res) {
     )
     .then((card) => {
       if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Карточка по указанному _id не найдена' });
+        next(new NotFoundError('Карточка по указанному _id не найдена'));
       }
       return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message:
-            'Переданы некорректные данные для установки лайка на карточке',
-        });
+        next(new BadRequestError('Переданы некорректные данные для установки лайка на карточке'));
       }
-      return res
-        .status(500)
-        .send({ message: 'Ошибка по умолчанию. Server error' });
+      return next(err);
     });
 }
 
-function dislikeCard(req, res) {
+function dislikeCard(req, res, next) {
   cardModel
     .findByIdAndUpdate(
       req.params.cardId,
@@ -87,21 +76,15 @@ function dislikeCard(req, res) {
     )
     .then((card) => {
       if (!card) {
-        return res
-          .status(404)
-          .send({ message: 'Карточка по указанному _id не найдена' });
+        next(new NotFoundError('Карточка по указанному _id не найдена'));
       }
       return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные для снятия лайка с карточки',
-        });
+        next(new BadRequestError('Переданы некорректные данные для снятия лайка с карточки'));
       }
-      return res
-        .status(500)
-        .send({ message: 'Ошибка по умолчанию. Server error' });
+      return next(err);
     });
 }
 

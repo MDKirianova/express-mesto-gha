@@ -2,6 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
+const NotFoundError = require('./errors/NotFound');
 
 const { PORT = 3000 } = process.env;
 
@@ -11,19 +15,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '656ce5314a1ae05871abc9f4', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
+app.post('/signup', createUser);
+app.post('/signin', login);
 
-  next();
-});
-
+app.use(auth);
 app.use(userRouter);
 app.use(cardRouter);
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страницы по такому URL не найдено' });
-});
+app.use((req, res, next) => next(new NotFoundError('Страницы по такому URL не найдено')));
+app.use(errorHandler);
 
 app.listen(PORT);
