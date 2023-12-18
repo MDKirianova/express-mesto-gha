@@ -76,7 +76,7 @@ function dislikeCard(req, res, next) {
     )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка по указанному _id не найдена'));
+        return next(new NotFoundError('Карточка по указанному _id не найдена'));
       }
       return res.status(200).send(card);
     })
