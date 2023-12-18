@@ -30,15 +30,22 @@ function createUser(req, res, next) {
       email,
       password: hash,
     }))
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'MongoServerError' && err.code === 11000) {
-        return next(new ConflictError('При регистрации указан email, который уже существует на сервере'));
-      }
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные при регистрации пользователя'));
-      }
-      return next(err);
+        next(new ConflictError('При регистрации указан email, который уже существует на сервере'));
+      } else
+        if (err.name === 'ValidationError') {
+          next(new BadRequestError('Переданы некорректные данные при регистрации пользователя'));
+        } else {
+          next(err);
+        }
     });
 }
 

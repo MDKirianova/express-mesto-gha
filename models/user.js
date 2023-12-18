@@ -24,13 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
     validate: { validator: (email) => /.+@.+\..+/.test(email) },
   },
   password: {
     type: String,
-    require: true,
+    required: true,
     select: false,
   },
 });

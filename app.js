@@ -6,6 +6,7 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./errors/NotFound');
+const { validateCreateUser, validateLoginUser } = require('./middlewares/validation');
 
 const { PORT = 3000 } = process.env;
 
@@ -15,8 +16,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validateCreateUser, createUser);
+app.post('/signin', validateLoginUser, login);
 
 app.use(auth);
 app.use(userRouter);
