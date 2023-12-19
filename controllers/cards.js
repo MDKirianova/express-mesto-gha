@@ -36,7 +36,7 @@ function deleteCard(req, res, next) {
       if (card.owner.toString() !== req.user._id) {
         return next(new ForbiddenError('Нет прав на удаление'));
       }
-      return cardModel.deleteOne(req.params.cardId).then(() => res.send({ message: 'Карточка удалена' })).catch(next);
+      return cardModel.findByIdAndDelete(req.params.cardId).then(() => res.send({ message: 'Карточка удалена' })).catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
