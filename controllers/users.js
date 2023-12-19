@@ -19,7 +19,7 @@ function createUser(req, res, next) {
   } = req.body;
 
   if (!email || !password) {
-    next(new BadRequestError('Email и пароль обязательные для регистрации'));
+    return next(new BadRequestError('Email и пароль обязательные для регистрации'));
   }
 
   return bcrypt.hash(password, SALT_ROUNDS)
@@ -39,21 +39,19 @@ function createUser(req, res, next) {
     }))
     .catch((err) => {
       if (err.name === 'MongoServerError' && err.code === 11000) {
-        next(new ConflictError('При регистрации указан email, который уже существует на сервере'));
-      } else
-        if (err.name === 'ValidationError') {
-          next(new BadRequestError('Переданы некорректные данные при регистрации пользователя'));
-        }
-        // else {
-        //   next(err);
-        // }
+        return next(new ConflictError('При регистрации указан email, который уже существует на сервере'));
+      }
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректные данные при регистрации пользователя'));
+      }
+      return next(err);
     });
 }
 
 function login(req, res, next) {
   const { email, password } = req.body;
   if (!email || !password) {
-    next(new BadRequestError('Email и пароль обязательные для авторизации'));
+    return next(new BadRequestError('Email и пароль обязательные для авторизации'));
   }
   return userModel.findUserByCredentials(email, password)
     .then((user) => {
@@ -118,13 +116,13 @@ function updateUserProfile(req, res, next) {
     )
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь по указанному _id не найден'));
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный _id пользователя'));
+        return next(new BadRequestError('Передан некорректный _id пользователя'));
       }
       return next(err);
     });
@@ -137,13 +135,13 @@ function updateUserAvatar(req, res, next) {
     .findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь по указанному _id не найден'));
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new NotFoundError('Переданы некорректные данные при обновлении аватара'));
+        return next(new NotFoundError('Переданы некорректные данные при обновлении аватара'));
       }
       return next(err);
     });
